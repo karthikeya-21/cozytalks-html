@@ -1,7 +1,7 @@
 // var id=sessionStorage.getItem('userId');
 var friendId;
 const dateTime = new Date();
-const socket = new WebSocket('ws://localhost:3000?userId='+id);
+const socket = new WebSocket('wss://cozytalks.onrender.com?userId='+id);
 
 socket.onopen = function(event) {
   console.log('Connected to server');
