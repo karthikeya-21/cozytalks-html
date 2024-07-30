@@ -1,6 +1,7 @@
 // var id=sessionStorage.getItem('userId');
 var friendId;
 const dateTime = new Date();
+// const socket = new WebSocket('ws://localhost:3000?userId='+id);
 const socket = new WebSocket('wss://cozytalks.onrender.com?userId='+id);
 
 socket.onopen = function(event) {
@@ -27,6 +28,11 @@ socket.onmessage = function(event) {
     }
     if(data.type=="message"){
         add_message_to_chat(data)
+    }
+    if(data.type=='load_history'){
+        data.data.forEach((msg)=>{
+            add_message_to_chat(msg)
+        })
     }
 }
 
@@ -72,7 +78,7 @@ function send_message(){
     }
     // Send the message to the server
     socket.send(JSON.stringify(data));
-    message.innerHTML='';
+    message.value='';
 }
 else{
     console.log(mess)
@@ -170,7 +176,8 @@ function make_chat_area(user_id, to_user_name)
 
         function add_message_to_chat(data){
             const msgsDiv = document.getElementById('msgs');
-            if(innerdata.fromUserId==id){
+            if(!msgsDiv) return
+            if(data.fromUserId==id){
             const element = `
                 <li class='message-right'>
                     <p class="message">
@@ -202,7 +209,7 @@ function make_chat_area(user_id, to_user_name)
 
         function load_old_messages(from_user_id,to_user_id){
             var data={
-                type : 'chat_history',
+                type : 'load_history',
                 fromUserId:from_user_id,
                 toUserId:to_user_id,
             }
