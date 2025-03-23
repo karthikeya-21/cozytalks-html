@@ -1,8 +1,7 @@
 // var id=sessionStorage.getItem('userId');
 var friendId;
 const dateTime = new Date();
-// const socket = new WebSocket('ws://localhost:3000?userId='+id);
-const socket = new WebSocket('wss://cozytalks.onrender.com?userId='+id);
+const socket = new WebSocket('wss://cozytalks.onrender.com?userId'+id);
 
 socket.onopen = function(event) {
   console.log('Connected to server');
@@ -12,9 +11,16 @@ socket.onopen = function(event) {
 socket.onmessage = function(event) {
     let data = JSON.parse(event.data);
     console.log('Received message:', data);
-    if(data.type == "connection"){
+    if(data.type == "connection" || data.type == "updateUI"){
         getUsers();
         getNotifications();
+        getFriends();
+    }
+    if(data.type == "process_friend_request"){
+        getNotifications();
+        getFriends();
+    }
+    if(data.type == "reload"){
         getFriends();
     }
     if(data.type == "userList"){
@@ -45,6 +51,7 @@ function getFriends(){
 }
 
 function getNotifications(){
+    console.log('callling notifications');
     socket.send(JSON.stringify({type:"load_notifications","userId":id}));
 }
 
@@ -53,7 +60,6 @@ function sendMessage(friendId, message){
 }
 
 function sendFriendRequest(friendId){
-    alert(friendId);
     socket.send(JSON.stringify({type:"send_request","fromUserId":id,"toUserId":friendId}));
 }
 
